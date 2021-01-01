@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservations Demo</title>
+    <script>
+
+        var attendees = [];
+
+        function compareAttendees(a, b) {
+            if (a.fullName < b.fullName) return -1;
+            if (a.fullName > b.fullName) return 1;
+            // we have equal full names, see company
+            if (a.company < b.company) return -1;
+            if (a.company > b.company) return 1;
+
+            return 0;
+        }
+
+        function addAttendee() {
+            getANewAttendee();
+            displayAttendees();
+            resetDataEntryFields();
+        }
+
+        function getANewAttendee() {
+            var attFullname = document.getElementById("attFullName").value;
+            var attCompany = document.getElementById("attCompany").value;
+            var attExperience = document.getElementById("attExperience").value;
+            var attEmail = document.getElementById("attEmail").value;
+            var attendee = {
+                fullName: attFullname,
+                company: attCompany,
+                experience: attExperience,
+                email: attEmail,
+            };
+            attendees.push(attendee);
+        }
+
+        function resetDataEntryFields() {
+            document.getElementById("attFullName").value = "";
+            document.getElementById("attCompany").value = "";
+            document.getElementById("attExperience").value = ""
+            document.getElementById("attEmail").value = ""
+        }
+
+        function displayAttendees() {
+            attendees.sort(compareAttendees);
+
+            var body = document.getElementById("attendeesTableBody");
+            body.innerHTML = ""; // remove previous rows
+
+            for (var i = 0; i < attendees.length; i++) {
+                var row = document.createElement("tr");
+
+                var cell = document.createElement("td");
+                cell.innerHTML = attendees[i].fullName;
+                row.appendChild(cell);
+
+                cell = document.createElement("td");
+                cell.innerHTML = attendees[i].company;
+                row.appendChild(cell);
+
+                cell = document.createElement("td");
+                cell.innerHTML = attendees[i].experience;
+                row.appendChild(cell);
+
+                cell = document.createElement("td");
+                cell.innerHTML = attendees[i].email;
+                row.appendChild(cell);
+
+                body.appendChild(row);
+            }
+        }
+
+
+        function loadFromServer() {
+            // AJAX request from the server
+            var req = new XMLHttpRequest();
+            req.open("GET", "http://127.0.0.1:3000/");
+            req.onload = function () {
+                if (req.status == 200) {
+                    attendees = JSON.parse(req.response);
+                    displayAttendees();
+                } else {
+                    attendees = [];
+                    displayAttendees();
+                    console.error("Problem loading attendees : " + req.status);
+                }
+            };
+            req.send();
+        }
+
+    </script>
+</head>
+
+<body>
+    <div id="adv-section" style="background-color: deepskyblue; text-align: center; padding-top: 2rem; height: 8rem;">
+        <img src="http://www.odyssea.com/wp-content/uploads/2020/07/logo_center.png">
+    </div>
+    <div id="data-section">
+        <form>
+            <div>
+                <label>Full name:</label><input type="text" name="attFullName" id="attFullName">
+            </div>
+            <div>
+                <label>Company:</label><input type="text" name="attCompany" id="attCompany">
+            </div>
+            <div>
+                <label>Experience:</label><input type="text" name="attExperience" id="attExperience">
+            </div>
+            <div>
+                <label>Email:</label><input type="text" name="attEmail" id="attEmail">
+            </div>
+            <div>
+                <input type="button" value="Register" onclick="addAttendee();">
+                <input type="button" value="Refresh" onclick="loadFromServer();">
+            </div>
+        </form>
+        <table border='1' id="attendeesTable">
+            <thead>
+                <tr>
+                    <th>Full name</th>
+                    <th>Company</th>
+                    <th>Experience</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody id="attendeesTableBody">
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
+<script>
+
+    loadFromServer();
+
+    // demo the time out
+    // Comment to load faster
+
+    // initial status
+    document.getElementById("adv-section").hidden = false;
+    document.getElementById("data-section").hidden = true;
+
+    // using a distinct function
+    // function callbackShowContent() {
+    //     document.getElementById("adv-section").hidden = true;
+    //     document.getElementById("data-section").hidden = false;
+    // }
+    // window.setTimeout(callbackShowContent, 2000);
+
+    // using an inline function
+    // window.setTimeout(function() {
+    //     document.getElementById("adv-section").hidden = true;
+    //     document.getElementById("data-section").hidden = false;
+    // }, 2000);
+
+    // using an arrow function
+    window.setTimeout(() => {
+        document.getElementById("adv-section").hidden = true;
+        document.getElementById("data-section").hidden = false;
+    }, 2000);
+
+
+</script>
